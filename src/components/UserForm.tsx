@@ -1,9 +1,9 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React from "react";
+import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import "../style.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { User } from "../types/User";
 import { v4 as uuidv4 } from "uuid";
 import { useUsers } from "../hooks/useUsers";
@@ -47,34 +47,65 @@ const schema = yup.object({
 
 const UserForm: React.FC = () => {
   const navigate = useNavigate();
-  const { addMutation } = useUsers();
+  const location = useLocation();
+
+  const { state: userData } = location;
+  const isEditMode = !!userData;
+  const { addMutation, updateMutation } = useUsers();
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<User>({
     resolver: yupResolver(schema),
+    defaultValues: userData || {},
   });
 
   const onSubmit: SubmitHandler<User> = (data) => {
-    const newUser = { ...data, id: uuidv4() };
+    if (isEditMode) {
+      //update
+      updateMutation.mutate(
+        {
+          userId: userData?.id ?? "",
+          updatedUser: { ...data },
+        },
+        {
+          onSuccess: () => {
+            navigate("/");
+          },
+          onError: (error) => {
+            console.log("Error updating user: ", error);
+          },
+        }
+      );
+    } else {
+      // add user
+      const newUser = { ...data, id: uuidv4() };
 
-    addMutation.mutate(newUser, {
-      onSuccess: () => {
-        navigate("/");
-      },
-      onError: (error) => {
-        console.error("Error adding user:", error);
-      },
-    });
+      addMutation.mutate(newUser, {
+        onSuccess: () => {
+          navigate("/");
+        },
+        onError: (error) => {
+          console.error("Error adding user:", error);
+        },
+      });
 
-    navigate("/");
+      navigate("/");
+    }
   };
+
+  useEffect(() => {
+    if (isEditMode && userData) {
+      reset(userData);
+    }
+  }, [isEditMode, userData, reset]);
 
   return (
     <div>
-      <h2>User Information Form</h2>
+      <h2>{isEditMode ? "Edit USer" : "Add User"}</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label>First Name:</label>
@@ -116,7 +147,7 @@ const UserForm: React.FC = () => {
           <input type="number" {...register("age")} />
           <p>{errors.age?.message}</p>
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit">{isEditMode ? "Update" : "Submit"}</button>
       </form>
     </div>
   );
