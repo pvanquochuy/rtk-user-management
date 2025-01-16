@@ -6,8 +6,7 @@ import "../style.css";
 import { useNavigate } from "react-router-dom";
 import { User } from "../types/User";
 import { v4 as uuidv4 } from "uuid";
-import { addUserAsync } from "../features/users/userSlice";
-import { useAppDispatch } from "../hooks/hooks";
+import { useUsers } from "../hooks/useUsers";
 
 const schema = yup.object({
   firstName: yup
@@ -47,8 +46,8 @@ const schema = yup.object({
 });
 
 const UserForm: React.FC = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { addMutation } = useUsers();
 
   const {
     register,
@@ -60,7 +59,16 @@ const UserForm: React.FC = () => {
 
   const onSubmit: SubmitHandler<User> = (data) => {
     const newUser = { ...data, id: uuidv4() };
-    dispatch(addUserAsync(newUser));
+
+    addMutation.mutate(newUser, {
+      onSuccess: () => {
+        navigate("/");
+      },
+      onError: (error) => {
+        console.error("Error adding user:", error);
+      },
+    });
+
     navigate("/");
   };
 

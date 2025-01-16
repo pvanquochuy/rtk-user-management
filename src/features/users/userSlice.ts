@@ -63,7 +63,7 @@ const userSlice = createSlice({
       console.log("User added :", action.payload);
     });
     builder.addCase(deleteUserAsync.fulfilled, (state, action) => {
-      state.users = state.users.filter((user) => user.id !== action.payload.id);
+      state.users = state.users.filter((user) => user.id !== action.payload);
     });
   },
 });

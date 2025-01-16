@@ -1,24 +1,19 @@
-import { useEffect } from "react";
-import { deleteUserAsync, fetchUserAsync } from "../features/users/userSlice";
-import { useAppSelector, useAppDispatch } from "../hooks/hooks";
+import { useUsers } from "../hooks/useUsers";
 import "./UserList.css";
 
 const UserList: React.FC = () => {
-  const users = useAppSelector((state) => state.users.users);
-  const dispatch = useAppDispatch();
+  const { users, isLoading, deleteMutation } = useUsers();
 
   const handleDelete = (id?: string) => {
     if (id) {
-      dispatch(deleteUserAsync(id));
-      dispatch(fetchUserAsync());
+      deleteMutation.mutate(id);
     } else {
       console.error("User ID is undefined");
     }
   };
 
-  useEffect(() => {
-    dispatch(fetchUserAsync());
-  }, [dispatch]);
+  if (isLoading) return <div>Loading...</div>;
+  if (!users) return <div>No Users found...</div>;
 
   return (
     <div className="container">
@@ -29,9 +24,7 @@ const UserList: React.FC = () => {
             <span>
               {user.firstName} {user.lastName} - {user.email}
             </span>
-            <button onClick={() => dispatch(() => handleDelete(user.id))}>
-              Delete
-            </button>
+            <button onClick={() => handleDelete(user.id)}>Delete</button>
           </li>
         ))}
       </ul>
