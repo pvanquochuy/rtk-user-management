@@ -3,10 +3,12 @@ import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import "../style.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { User } from "../types/User";
 import { v4 as uuidv4 } from "uuid";
 import { useUsers } from "../hooks/useUsers";
+import { RootState } from "../states/store";
+import { useSelector } from "react-redux";
 
 const schema = yup.object({
   firstName: yup
@@ -47,10 +49,11 @@ const schema = yup.object({
 
 const UserForm: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const selectedUser = useSelector(
+    (state: RootState) => state.users.selectedUser
+  );
 
-  const { state: userData } = location;
-  const isEditMode = !!userData;
+  const isEditMode = !!selectedUser;
   const { addMutation, updateMutation } = useUsers();
 
   const {
@@ -60,7 +63,7 @@ const UserForm: React.FC = () => {
     formState: { errors },
   } = useForm<User>({
     resolver: yupResolver(schema),
-    defaultValues: userData || {},
+    defaultValues: selectedUser || {},
   });
 
   const onSubmit: SubmitHandler<User> = (data) => {
@@ -68,7 +71,7 @@ const UserForm: React.FC = () => {
       //update
       updateMutation.mutate(
         {
-          userId: userData?.id ?? "",
+          userId: selectedUser?.id ?? "",
           updatedUser: { ...data },
         },
         {
@@ -98,10 +101,10 @@ const UserForm: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isEditMode && userData) {
-      reset(userData);
+    if (isEditMode && selectedUser) {
+      reset(selectedUser);
     }
-  }, [isEditMode, userData, reset]);
+  }, [isEditMode, selectedUser, reset]);
 
   return (
     <div>

@@ -8,8 +8,8 @@
       "confirmPassword": "111111",
       "password": "111111",
       "email": "pvanquochuy@gmail.com",
-      "lastName": "Quoc",
-      "firstName": "Đẹp trai"
+      "lastName": "Curry",
+      "firstName": "Jame"
     },
     {
       "id": "a3368115-262a-4cc1-b8d4-cdb548453cc7",
@@ -21,6 +21,17 @@
       "email": "demo@gmail.com",
       "lastName": "Curry",
       "firstName": "Tony"
+    },
+    {
+      "id": "4b49dbd2-aa3b-4c29-919d-a526c714b2ac",
+      "age": 21,
+      "address": "Thanh Hoa",
+      "phoneNumber": "0399302966",
+      "confirmPassword": "quochuy2k2",
+      "password": "quochuy2k2",
+      "email": "phamhuuy@gmail.com",
+      "lastName": "Pham",
+      "firstName": "Huy"
     }
   ]
 }

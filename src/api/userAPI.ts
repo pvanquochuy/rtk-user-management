@@ -1,10 +1,16 @@
-import { updateUsers } from "./userAPI";
 import { User } from "../types/User";
 
 export const fetchUsers = async (): Promise<User[]> => {
   const response = await fetch("http://localhost:3000/users");
   if (!response.ok) {
     throw new Error("Failed to fetch users");
+  }
+  return response.json();
+};
+export const fetchUserById = async (id: string): Promise<User> => {
+  const response = await fetch(`http://localhost:3000/users/${id}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user with ID: ${id}`);
   }
   return response.json();
 };

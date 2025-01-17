@@ -2,14 +2,17 @@ import { useNavigate } from "react-router-dom";
 import { useUsers } from "../hooks/useUsers";
 import "./UserList.css";
 import { User } from "../types/User";
+import { useDispatch } from "react-redux";
+import { setSelectedUser } from "../features/users/userSlice";
 
 const UserList: React.FC = () => {
   const { users, isLoading, deleteMutation } = useUsers();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleEdit = (user: User) => {
-    navigate("/add-user", { state: user });
-    console.log("user data: ", user);
+    dispatch(setSelectedUser(user));
+    navigate("/add-user");
   };
 
   const handleDelete = (id?: string) => {

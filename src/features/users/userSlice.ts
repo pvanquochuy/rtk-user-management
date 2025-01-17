@@ -4,10 +4,12 @@ import { addUsers, deleteUsers, fetchUsers } from "../../api/userAPI";
 
 interface UserState {
   users: User[];
+  selectedUser: User | null;
 }
 
 const initialState: UserState = {
   users: [],
+  selectedUser: null,
 };
 
 export const fetchUserAsync = createAsyncThunk<User[]>(
@@ -53,6 +55,9 @@ const userSlice = createSlice({
     deleteUser: (state, action: PayloadAction<User>) => {
       state.users = state.users.filter((user) => user.id !== action.payload.id);
     },
+    setSelectedUser: (state, action: PayloadAction<User | null>) => {
+      state.selectedUser = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchUserAsync.fulfilled, (state, action) => {
@@ -60,7 +65,6 @@ const userSlice = createSlice({
     });
     builder.addCase(addUserAsync.fulfilled, (state, action) => {
       state.users.push(action.payload);
-      console.log("User added :", action.payload);
     });
     builder.addCase(deleteUserAsync.fulfilled, (state, action) => {
       state.users = state.users.filter((user) => user.id !== action.payload);
@@ -68,5 +72,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { addUser, updateUser, deleteUser } = userSlice.actions;
+export const { addUser, updateUser, deleteUser, setSelectedUser } =
+  userSlice.actions;
 export default userSlice.reducer;
