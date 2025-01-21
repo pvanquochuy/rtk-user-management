@@ -1,14 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addUsers, deleteUsers, fetchUsers, updateUsers } from "../api/userAPI";
-import { User } from "../types/User";
+import {
+  addUsers,
+  deleteUsers,
+  fetchPaginatedUsers,
+  updateUsers,
+} from "../api/userAPI";
+import { useState } from "react";
 
 export const useUsers = () => {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [size] = useState(5);
 
-  const { data: users, isLoading } = useQuery<User[], Error>({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["users", page],
+    queryFn: () => fetchPaginatedUsers(page, size),
+    // keepPreviousData: true, // Keeps old data while fetching new data
   });
+
+  console.log("data:", data); // Check the structure of data here
+
+  const users = data?.users || [];
+  const totalPages = data?.totalPages || 1;
+
+  console.log("user: ", users);
+  console.log("totalPages: ", totalPages);
 
   const addMutation = useMutation({
     mutationFn: addUsers,
@@ -25,5 +41,16 @@ export const useUsers = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
 
-  return { users, isLoading, addMutation, updateMutation, deleteMutation };
+  return {
+    users,
+    isLoading,
+    addMutation,
+    updateMutation,
+    deleteMutation,
+    isError,
+    error,
+    page,
+    totalPages,
+    setPage,
+  };
 };

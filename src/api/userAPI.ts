@@ -1,5 +1,28 @@
 import { User } from "../types/User";
 
+export const fetchPaginatedUsers = async (
+  page: number,
+  size: number
+): Promise<{ users: User[]; totalPages: number }> => {
+  const response = await fetch(`http://localhost:3000/users`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch users");
+  }
+
+  const allUsers: User[] = await response.json();
+  const totalUsers = allUsers.length;
+  const totalPages = Math.ceil(totalUsers / size);
+
+  const startIndex = (page - 1) * size;
+  const paginatedUsers = allUsers.slice(startIndex, startIndex + size);
+
+  return {
+    users: paginatedUsers,
+    totalPages,
+  };
+};
+
 export const fetchUsers = async (): Promise<User[]> => {
   const response = await fetch("http://localhost:3000/users");
   if (!response.ok) {
@@ -7,6 +30,7 @@ export const fetchUsers = async (): Promise<User[]> => {
   }
   return response.json();
 };
+
 export const fetchUserById = async (id: string): Promise<User> => {
   const response = await fetch(`http://localhost:3000/users/${id}`);
   if (!response.ok) {
