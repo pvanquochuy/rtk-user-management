@@ -131,8 +131,13 @@ const UserForm: React.FC = () => {
           <p>{errors.email?.message}</p>
         </div>
         <div>
-          <label htmlFor="abc">abc:</label>
-          <input id="abc" type="password" {...register("password")} />
+          <label htmlFor="password">password:</label>
+          <input
+            id="password"
+            type="password"
+            aria-label="Password"
+            {...register("password")}
+          />
           <p>{errors.password?.message}</p>
         </div>
         <div>
@@ -140,6 +145,7 @@ const UserForm: React.FC = () => {
           <input
             id="confirmPassword"
             type="password"
+            aria-label="Confirm Password"
             {...register("confirmPassword")}
           />
           <p>{errors.confirmPassword?.message}</p>

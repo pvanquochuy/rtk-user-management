@@ -42,8 +42,9 @@ describe("UserForm", () => {
     expect(screen.getByLabelText(/First Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Last Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/abc/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Confirm Password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText("Password")).toBeInTheDocument();
+    expect(screen.getByLabelText("Confirm Password")).toBeInTheDocument();
+
     expect(screen.getByLabelText(/Phone Number/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Age/i)).toBeInTheDocument();
@@ -121,10 +122,10 @@ describe("UserForm", () => {
     fireEvent.change(screen.getByLabelText(/Email/i), {
       target: { value: "john.doe@example.com" },
     });
-    fireEvent.change(screen.getByLabelText(/abc/i), {
+    fireEvent.change(screen.getByLabelText("Password"), {
       target: { value: "password123" },
     });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+    fireEvent.change(screen.getByLabelText("Confirm Password"), {
       target: { value: "password123" },
     });
     fireEvent.change(screen.getByLabelText(/Phone Number/i), {
