@@ -3,12 +3,12 @@ import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import "../style.css";
-import { useNavigate } from "react-router-dom";
 import { User } from "../types/User";
 import { v4 as uuidv4 } from "uuid";
 import { useUsers } from "../hooks/useUsers";
 import { RootState } from "../states/store";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const schema = yup.object({
   firstName: yup
@@ -61,9 +61,11 @@ const UserForm: React.FC = () => {
     handleSubmit,
     reset,
     formState: { errors },
+    trigger,
   } = useForm<User>({
     resolver: yupResolver(schema),
     defaultValues: selectedUser || {},
+    mode: "onBlur",
   });
 
   const onSubmit: SubmitHandler<User> = (data) => {
@@ -90,13 +92,12 @@ const UserForm: React.FC = () => {
       addMutation.mutate(newUser, {
         onSuccess: () => {
           navigate("/");
+          console.log("Form submitted!");
         },
         onError: (error) => {
           console.error("Error adding user:", error);
         },
       });
-
-      navigate("/");
     }
   };
 
@@ -111,43 +112,51 @@ const UserForm: React.FC = () => {
       <h2>{isEditMode ? "Edit USer" : "Add User"}</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label>First Name:</label>
-          <input {...register("firstName")} />
+          <label htmlFor="firstName">First Name:</label>
+          <input
+            id="firstName"
+            {...register("firstName")}
+            onBlur={(): Promise<boolean> => trigger("firstName")}
+          />
           <p>{errors.firstName?.message}</p>
         </div>
         <div>
-          <label>Last Name:</label>
-          <input {...register("lastName")} />
+          <label htmlFor="lastName">Last Name:</label>
+          <input id="lastName" {...register("lastName")} />
           <p>{errors.lastName?.message}</p>
         </div>
         <div>
-          <label>Email:</label>
-          <input {...register("email")} />
+          <label htmlFor="email">Email:</label>
+          <input id="email" {...register("email")} />
           <p>{errors.email?.message}</p>
         </div>
         <div>
-          <label>Password:</label>
-          <input type="password" {...register("password")} />
+          <label htmlFor="abc">abc:</label>
+          <input id="abc" type="password" {...register("password")} />
           <p>{errors.password?.message}</p>
         </div>
         <div>
-          <label>Confirm Password:</label>
-          <input type="password" {...register("confirmPassword")} />
+          <label htmlFor="confirmPassword">Confirm Password:</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            {...register("confirmPassword")}
+          />
           <p>{errors.confirmPassword?.message}</p>
         </div>
         <div>
-          <label>Phone Number:</label>
-          <input {...register("phoneNumber")} />
+          <label htmlFor="phoneNumber">Phone Number:</label>
+          <input id="phoneNumber" {...register("phoneNumber")} />
           <p>{errors.phoneNumber?.message}</p>
         </div>
         <div>
-          <label>Address:</label>
-          <input {...register("address")} />
+          <label htmlFor="address">Address:</label>
+          <input id="address" {...register("address")} />
           <p>{errors.address?.message}</p>
         </div>
         <div>
-          <label>Age:</label>
-          <input type="number" {...register("age")} />
+          <label htmlFor="age">Age:</label>
+          <input id="age" type="number" {...register("age")} />
           <p>{errors.age?.message}</p>
         </div>
         <button type="submit">{isEditMode ? "Update" : "Submit"}</button>
