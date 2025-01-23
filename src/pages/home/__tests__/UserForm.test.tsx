@@ -1,24 +1,25 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import UserForm from "../components/UserForm";
 import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "../states/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useUsers } from "../hooks/useUsers";
+import userEvent from "@testing-library/user-event";
+import { store } from "../../../states/store";
+import { useUsers } from "../../../hooks/useUsers";
+import UserForm from "../../../components/UserForm";
 
-jest.mock("../hooks/useUsers", () => ({
+jest.mock("../../../hooks/useUsers", () => ({
   useUsers: jest.fn(),
 }));
 
-const renderUserForm = () => {
+const renderUserForm = (props = {}) => {
   const queryClient = new QueryClient();
 
   return render(
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
         <MemoryRouter>
-          <UserForm />
+          <UserForm {...props} />
         </MemoryRouter>
       </Provider>
     </QueryClientProvider>
@@ -39,22 +40,31 @@ describe("UserForm", () => {
     renderUserForm();
 
     // Check if required fields and submit button are rendered
-    expect(screen.getByLabelText(/First Name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Last Name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /First Name/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /Last Name/i })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: /Email/i })).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.getByLabelText("Confirm Password")).toBeInTheDocument();
-
-    expect(screen.getByLabelText(/Phone Number/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Age/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /Phone Number/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /Address/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("spinbutton", { name: /Age/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Submit/i })).toBeInTheDocument();
   });
 
   test("shows validation errors for required fields", async () => {
     renderUserForm();
 
-    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    userEvent.click(screen.getByRole("button", { name: /submit/i }));
 
     // Validate required field errors
     expect(
@@ -90,11 +100,11 @@ describe("UserForm", () => {
   test("shows validation error when input is cleared and blurred", async () => {
     renderUserForm();
 
-    const firstNameInput = screen.getByLabelText(/first name/i);
-    fireEvent.change(firstNameInput, { target: { value: "John" } });
+    const firstNameInput = screen.getByRole("textbox", { name: /first name/i });
+    userEvent.type(firstNameInput, "John");
 
-    fireEvent.change(firstNameInput, { target: { value: "" } });
-    fireEvent.blur(firstNameInput);
+    userEvent.clear(firstNameInput);
+    userEvent.tab();
 
     // Validate required error after clearing input
     await waitFor(() => {
@@ -138,7 +148,7 @@ describe("UserForm", () => {
       target: { value: "25" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    userEvent.click(screen.getByRole("button", { name: /submit/i }));
 
     await waitFor(() => {
       expect(addMutation.mutate).toHaveBeenCalledWith(
